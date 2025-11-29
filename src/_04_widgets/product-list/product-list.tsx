@@ -2,12 +2,11 @@
 
 import Grid from '@mui/material/Grid';
 import { JSX, useEffect } from 'react';
-import { Product } from '@/_02_entities/product/model/product.schema';
 import { useAppDispatch, useAppSelector } from '@/_01_shared/store/hooks';
 import { setProducts } from '@/_02_entities/product/model/product.slice';
 import { ProductCardListItem } from '@/_04_widgets/product-card-list-item/product-card-list-item';
 
-export const ProductList = ({ initialState }: { initialState: Product[] }): JSX.Element => {
+export const ProductList = (): JSX.Element => {
   const dispatch = useAppDispatch();
   const products = useAppSelector((state) => state.products.items);
   const query = useAppSelector((s) => s.search.query)
@@ -34,10 +33,17 @@ export const ProductList = ({ initialState }: { initialState: Product[] }): JSX.
     });
 
   useEffect(() => {
+    const fetchProducts = async () => {
+      const res = await fetch(process.env.NEXT_PUBLIC_API_URL);
+      const data = await res.json();
+
+      dispatch(setProducts(data));
+    };
+
     if (products.length === 0) {
-      dispatch(setProducts(initialState));
+      fetchProducts();
     }
-  }, [products.length, dispatch, initialState]);
+  }, [products.length, dispatch]);
 
   return (
     <Grid container rowSpacing={2} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
