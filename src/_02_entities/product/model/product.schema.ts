@@ -6,7 +6,7 @@ export const productSchema = z.object({
   price: z.number(),
   description: z.string(),
   category: z.string(),
-  image: z.string(),
+  image: z.string().nullable(),
   rating: z.object({
     rate: z.number(),
     count: z.number(),
