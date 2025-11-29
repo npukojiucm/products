@@ -5,14 +5,22 @@ import { SearchBar } from '@/_03_features/search-bar/ui/search-bar';
 import { ProductList } from '@/_04_widgets/product-list/product-list';
 
 export default async function ProductsPage(): Promise<JSX.Element> {
-    if (!process.env.API_URL) {
-    throw new Error("API_URL environment variable is missing");
-  }
+const url = process.env.API_URL!;
+  let products: Product[] = [];
 
-  const products: Product[] = await fetch(process.env.API_URL, {
-    cache: "no-store",      // << обязательное
-    // next: { revalidate: 0 } // альтернативно
-  }).then((res) => res.json());
+  try {
+    const res = await fetch(url, { cache: "no-store" });
+
+    if (!res.ok) {
+      console.error("Fetch failed:", res.status, await res.text());
+      throw new Error("Failed to load products");
+    }
+
+    products = await res.json();
+  } catch (e) {
+    console.error("SSR fetch error:", e);
+    products = [];
+  }
 
   return (
     <>
